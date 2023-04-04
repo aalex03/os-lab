@@ -1,0 +1,34 @@
+Write a C program that receives as params multiple arguments representing paths to regular files, directories and sym links. Depending of the file type (r,g,d,s.l), print an interactive menu
+
+A) Regular file
+-n (file name)
+-d (dim/size)
+-h (number of hard links)
+-m (time of last modification)
+-a (access rights)
+-l (create a sym link give:link name)
+
+B) Symbolic link
+-n (link name)
+-l (delete link)
+-d (size of link)
+-z (size of target)
+-a (access rights for symbolic link)
+
+C) Directories
+-n (name)
+-d (size)
+-a (access rights)
+-c (total number of .c files)
+
+Access rights format:
+USER
+    Read: YES
+    Write: NO
+    Exec: YES
+GROUP
+    Read: YES
+    Write: YES
+    Exec: NO
+OTHERS
+    ...
