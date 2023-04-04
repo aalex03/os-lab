@@ -63,11 +63,13 @@ int handleDirectory(char filename[])
 
 void handleMenu(char filename[],struct stat buff)
 {
-    char options[10];
+    char input[10];
     if(S_ISREG(buff.st_mode))  
     {
         printf("Regular file: %s\nEnter options:\n-n (file name)\n-d(dim/size)\n-h (number of hard links)\n-m (time of last modif)\n-a (access rights)\n-l [filename] (create a symbolic link)\n",filename);
-        scanf("-%10s",options);
+        fgets(input,10,stdin);
+        char options[10];
+        sscanf(input,"-%10s",options);
         for (int i = 0; i < strlen(options); i++)
         {
             switch (options[i])
@@ -98,7 +100,9 @@ void handleMenu(char filename[],struct stat buff)
     else if(S_ISLNK(buff.st_mode))
     {
         printf("Symbolic link: %s\nEnter options:\n-n (link name)\n-l (delete link)\n-d (size of link)\n-z (size of target)\n-a (access rights for symbolic link)\n",filename);
-        scanf("-%10s",options);
+        fgets(input,10,stdin);
+        char options[10];
+        sscanf(input,"-%10s",options);
         for (int i = 0; i < strlen(options); i++)
         {
             switch (options[i])
@@ -126,7 +130,9 @@ void handleMenu(char filename[],struct stat buff)
     else if(S_ISDIR(buff.st_mode))
     {
         printf("Directory: %s\nEnter options:\n-n (name)\n-d(dim/size)\n-a (access rights)\n-c (total number of .c files)\n",filename);
-        scanf("-%10s",options);
+        fgets(input,10,stdin);
+        char options[10];
+        sscanf(input,"-%10s",options);
         for (int i = 0; i < strlen(options); i++)
         {
             switch (options[i])
