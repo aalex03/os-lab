@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <dirent.h>
 
 void printAccessRights(struct stat* file)
 {
@@ -40,6 +41,24 @@ void printLinkedFile(char filename[])
     struct stat buff;
     lstat(linkname,&buff);
     printf("Size of target: %ld\n",buff.st_size);
+}
+
+int handleDirectory(char filename[])
+{
+    DIR *dir;
+    dir = opendir(filename);
+    struct dirent *entry;
+    int count = 0;
+    while((entry = readdir(dir)) != NULL)
+    {
+        char *name = entry->d_name;
+        if(strstr(name,".c")!=NULL)
+        {
+            count++;
+        }
+    }
+
+    return count;
 }
 
 void handleMenu(char filename[],struct stat buff)
@@ -122,7 +141,7 @@ void handleMenu(char filename[],struct stat buff)
                 printAccessRights(&buff);
                 break;
             case 'c':
-                printf("Not implemented\n");
+                printf("%d\n",handleDirectory(filename));
                 break;
             default:
                 break;
