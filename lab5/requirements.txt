@@ -1,4 +1,9 @@
-Write a C program that receives as params multiple arguments representing paths to regular files, directories and sym links. Depending of the file type (r,g,d,s.l), print an interactive menu
+Write a C program that receives as params multiple arguments representing paths to regular files, directories and sym links. 
+Depending of the file type (r,g,d,s.l), print an interactive menu
+
+For each argument, create a new process that parses the options.
+If the argument is a .c file, another process will execute a script that recieves a file as an argument and displays the number of warnings and errors
+after compiling.
 
 A) Regular file
 -n (file name)
