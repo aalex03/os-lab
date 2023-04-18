@@ -9,8 +9,9 @@
 #include <string.h>
 #include <time.h>
 #include <dirent.h>
+#include <sys/wait.h>
 
-void printAccessRights(struct stat* file)
+void printAccessRights(struct stat *file)
 {
     printf("USER\n");
     printf("\tRead: %s\n", (file->st_mode & S_IRUSR) ? "Yes" : "No");
@@ -30,17 +31,17 @@ void createSymlink(char filename[])
 {
     puts("Enter linkname: ");
     char linkname[100];
-    scanf("%s",linkname);
-    symlink(filename,linkname);
+    scanf("%s", linkname);
+    symlink(filename, linkname);
 }
 
 void printLinkedFile(char filename[])
 {
     char linkname[100];
-    readlink(filename,linkname,100);
+    readlink(filename, linkname, 100);
     struct stat buff;
-    lstat(linkname,&buff);
-    printf("Size of target: %ld\n",buff.st_size);
+    lstat(linkname, &buff);
+    printf("Size of target: %ld\n", buff.st_size);
 }
 
 int handleDirectory(char filename[])
@@ -49,10 +50,10 @@ int handleDirectory(char filename[])
     dir = opendir(filename);
     struct dirent *entry;
     int count = 0;
-    while((entry = readdir(dir)) != NULL)
+    while ((entry = readdir(dir)) != NULL)
     {
         char *name = entry->d_name;
-        if(strstr(name,".c")!=NULL)
+        if (strstr(name, ".c") != NULL)
         {
             count++;
         }
@@ -61,30 +62,30 @@ int handleDirectory(char filename[])
     return count;
 }
 
-void handleMenu(char filename[],struct stat buff)
+void handleMenu(char filename[], struct stat buff)
 {
     char input[10];
-    if(S_ISREG(buff.st_mode))  
+    if (S_ISREG(buff.st_mode))
     {
-        printf("Regular file: %s\nEnter options:\n-n (file name)\n-d(dim/size)\n-h (number of hard links)\n-m (time of last modif)\n-a (access rights)\n-l [filename] (create a symbolic link)\n",filename);
-        fgets(input,10,stdin);
+        printf("Regular file: %s\nEnter options:\n-n (file name)\n-d(dim/size)\n-h (number of hard links)\n-m (time of last modif)\n-a (access rights)\n-l [filename] (create a symbolic link)\n", filename);
+        fgets(input, 10, stdin);
         char options[10];
-        sscanf(input,"-%10s",options);
+        sscanf(input, "-%10s", options);
         for (int i = 0; i < strlen(options); i++)
         {
             switch (options[i])
             {
             case 'n':
-                printf("%s\n",filename);
+                printf("%s\n", filename);
                 break;
             case 'd':
-                printf("%ld\n",buff.st_size);
+                printf("%ld\n", buff.st_size);
                 break;
             case 'h':
-                printf("%ld\n",buff.st_nlink);
+                printf("%ld\n", buff.st_nlink);
                 break;
             case 'm':
-                printf("%s",ctime(&buff.st_mtime));
+                printf("%s", ctime(&buff.st_mtime));
                 break;
             case 'a':
                 printAccessRights(&buff);
@@ -97,24 +98,24 @@ void handleMenu(char filename[],struct stat buff)
             }
         }
     }
-    else if(S_ISLNK(buff.st_mode))
+    else if (S_ISLNK(buff.st_mode))
     {
-        printf("Symbolic link: %s\nEnter options:\n-n (link name)\n-l (delete link)\n-d (size of link)\n-z (size of target)\n-a (access rights for symbolic link)\n",filename);
-        fgets(input,10,stdin);
+        printf("Symbolic link: %s\nEnter options:\n-n (link name)\n-l (delete link)\n-d (size of link)\n-z (size of target)\n-a (access rights for symbolic link)\n", filename);
+        fgets(input, 10, stdin);
         char options[10];
-        sscanf(input,"-%10s",options);
+        sscanf(input, "-%10s", options);
         for (int i = 0; i < strlen(options); i++)
         {
             switch (options[i])
             {
             case 'n':
-                printf("%s\n",filename);
+                printf("%s\n", filename);
                 break;
             case 'l':
                 unlink(filename);
                 break;
             case 'd':
-                printf("%ld\n",buff.st_size);
+                printf("%ld\n", buff.st_size);
                 break;
             case 'z':
                 printLinkedFile(filename);
@@ -127,27 +128,27 @@ void handleMenu(char filename[],struct stat buff)
             }
         }
     }
-    else if(S_ISDIR(buff.st_mode))
+    else if (S_ISDIR(buff.st_mode))
     {
-        printf("Directory: %s\nEnter options:\n-n (name)\n-d(dim/size)\n-a (access rights)\n-c (total number of .c files)\n",filename);
-        fgets(input,10,stdin);
+        printf("Directory: %s\nEnter options:\n-n (name)\n-d(dim/size)\n-a (access rights)\n-c (total number of .c files)\n", filename);
+        fgets(input, 10, stdin);
         char options[10];
-        sscanf(input,"-%10s",options);
+        sscanf(input, "-%10s", options);
         for (int i = 0; i < strlen(options); i++)
         {
             switch (options[i])
             {
             case 'n':
-                printf("%s\n",filename);
+                printf("%s\n", filename);
                 break;
             case 'd':
-                printf("%ld\n",buff.st_size);
+                printf("%ld\n", buff.st_size);
                 break;
             case 'a':
                 printAccessRights(&buff);
                 break;
             case 'c':
-                printf("%d\n",handleDirectory(filename));
+                printf("%d\n", handleDirectory(filename));
                 break;
             default:
                 break;
@@ -155,27 +156,53 @@ void handleMenu(char filename[],struct stat buff)
         }
     }
 }
-
+void handleCfile(char filename)
+{
+}
 int main(int argc, char *argv[])
 {
-    if(argc<2)
+    if (argc < 2)
     {
-        printf("Usage: %s [file1 file2 ...]\n",argv[0]);
+        printf("Usage: %s [file1 file2 ...]\n", argv[0]);
         exit(EXIT_FAILURE);
     }
     struct stat buff;
-
+    pid_t pids[argc - 1];
     for (int i = 1; i < argc; i++)
     {
-        int result = lstat(argv[i],&buff);  //returns 0 on success and -1 on failure
-        if(result==0)
+        int result = lstat(argv[i], &buff);
+        // check if filename ends in .c
+        if (strstr(argv[i], ".c") != NULL)
         {
-            handleMenu(argv[i],buff);
+            printf("C file: %s\n", argv[i]);
+            char *args[] = {"./compileScript.sh", argv[i], NULL};
+            pids[i - 1] = fork();
+            if (pids[i - 1] == 0)
+            {
+                execvp(args[0], args);
+            }
+        }
+        else if (result == 0)
+        {
+            pids[i - 1] = fork();
+            if (pids[i - 1] < 0)
+            {
+                printf("fork failed");
+                exit(EXIT_FAILURE);
+            }
+            else if (pids[i - 1] == 0)
+            {
+                handleMenu(argv[i], buff);
+                exit(EXIT_SUCCESS);
+            }
         }
         else
         {
             printf("could not read info about file");
         }
     }
-    
+    for (int i = 0; i < argc - 1; i++)
+    {
+        waitpid(pids[i], NULL, 0);
+    }
 }
