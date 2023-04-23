@@ -10,6 +10,7 @@
 #include <time.h>
 #include <dirent.h>
 #include <sys/wait.h>
+#include "helpers.h"
 
 typedef struct _result
 {
@@ -17,56 +18,7 @@ typedef struct _result
     int count;
 }Result;
 
-void printAccessRights(struct stat *file)
-{
-    printf("USER\n");
-    printf("\tRead: %s\n", (file->st_mode & S_IRUSR) ? "Yes" : "No");
-    printf("\tWrite: %s\n", (file->st_mode & S_IWUSR) ? "Yes" : "No");
-    printf("\tExecute: %s\n", (file->st_mode & S_IXUSR) ? "Yes" : "No");
-    printf("GROUP\n");
-    printf("\tRead: %s\n", (file->st_mode & S_IRGRP) ? "Yes" : "No");
-    printf("\tWrite: %s\n", (file->st_mode & S_IWGRP) ? "Yes" : "No");
-    printf("\tExecute: %s\n", (file->st_mode & S_IXGRP) ? "Yes" : "No");
-    printf("OTHER\n");
-    printf("\tRead: %s\n", (file->st_mode & S_IROTH) ? "Yes" : "No");
-    printf("\tWrite: %s\n", (file->st_mode & S_IWOTH) ? "Yes" : "No");
-    printf("\tExecute: %s\n", (file->st_mode & S_IXOTH) ? "Yes" : "No");
-}
-
-void createSymlink(char filename[])
-{
-    puts("Enter linkname: ");
-    char linkname[100];
-    scanf("%s", linkname);
-    symlink(filename, linkname);
-}
-
-void printLinkedFile(char filename[])
-{
-    char linkname[100];
-    readlink(filename, linkname, 100);
-    struct stat buff;
-    lstat(linkname, &buff);
-    printf("Size of target: %ld\n", buff.st_size);
-}
-
-int countDirectoryCfiles(char filename[])
-{
-    DIR *dir;
-    dir = opendir(filename);
-    struct dirent *entry;
-    int count = 0;
-    while ((entry = readdir(dir)) != NULL)
-    {
-        char *name = entry->d_name;
-        if (strstr(name, ".c") != NULL)
-        {
-            count++;
-        }
-    }
-
-    return count;
-}
+Result handleMenu(char filename[], struct stat *buff);
 
 void handleRegularFile(char filename[], struct stat *buff, char options[])
 {
@@ -93,6 +45,8 @@ void handleRegularFile(char filename[], struct stat *buff, char options[])
             createSymlink(filename);
             break;
         default:
+            printf("Invalid option: %c\n", options[i]);
+            handleMenu(filename, buff);
             break;
         }
     }
@@ -147,19 +101,6 @@ void handleDirectory(char filename[], struct stat *buff, char options[])
                 break;
             }
         }
-}
-
-pid_t handleCfile(char filename[])
-{
-    printf("C file: %s\n", filename);
-    char *args[] = {"./compileScript.sh", filename, NULL};
-    pid_t pid = fork();
-    if (pid == 0)
-    {
-        execvp(args[0], args);
-        exit(0);
-    }
-    return pid;
 }
 
 Result handleMenu(char filename[], struct stat *buff)
