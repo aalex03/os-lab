@@ -63,6 +63,7 @@ void handleSymbolicLink(char filename[], struct stat *buff, char options[])
             break;
         case 'l':
             unlink(filename);
+            return;
             break;
         case 'd':
             printf("%ld\n", buff->st_size);
