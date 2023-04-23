@@ -16,3 +16,4 @@ void printLinkedFile(char filename[]);
 int countDirectoryCfiles(char filename[]);
 pid_t handleCfile(char filename[]);
 void printAccessRights(struct stat *file);
+int ends_with_c_extension(char filename[]);

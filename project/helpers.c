@@ -62,3 +62,12 @@ pid_t handleCfile(char filename[])
     }
     return pid;
 }
+
+int ends_with_c_extension(char filename[])
+{
+    int len = strlen(filename);
+    if (len < 3) { // The string is too short to contain a ".c" extension
+        return 0;
+    }
+    return (strcmp(&filename[len-2], ".c") == 0);
+}
