@@ -16,7 +16,7 @@ typedef struct _result
 {
     pid_t pids[5];
     int count;
-}Result;
+} Result;
 
 Result handleMenu(char filename[], struct stat *buff);
 
@@ -82,36 +82,36 @@ void handleSymbolicLink(char filename[], struct stat *buff, char options[])
 void handleDirectory(char filename[], struct stat *buff, char options[])
 {
     for (int i = 0; i < strlen(options); i++)
+    {
+        switch (options[i])
         {
-            switch (options[i])
-            {
-            case 'n':
-                printf("%s\n", filename);
-                break;
-            case 'd':
-                printf("%ld\n", buff->st_size);
-                break;
-            case 'a':
-                printAccessRights(buff);
-                break;
-            case 'c':
-                printf("%d\n", countDirectoryCfiles(filename));
-                break;
-            default:
-                break;
-            }
+        case 'n':
+            printf("%s\n", filename);
+            break;
+        case 'd':
+            printf("%ld\n", buff->st_size);
+            break;
+        case 'a':
+            printAccessRights(buff);
+            break;
+        case 'c':
+            printf("%d\n", countDirectoryCfiles(filename));
+            break;
+        default:
+            break;
         }
+    }
 }
 
 Result handleMenu(char filename[], struct stat *buff)
 {
-    char input[10];
+    char input[100];
     Result menuResult;
-    menuResult.count=0;
+    menuResult.count = 0;
     if (S_ISREG(buff->st_mode))
     {
         printf("Regular file: %s\nEnter options:\n-n (file name)\n-d (dim/size)\n-h (number of hard links)\n-m (time of last modif)\n-a (access rights)\n-l [filename] (create a symbolic link)\n", filename);
-        fgets(input, 10, stdin);
+        fgets(input, 100, stdin);
         char options[10];
         sscanf(input, "-%10s", options);
         menuResult.pids[0] = fork();
@@ -121,12 +121,11 @@ Result handleMenu(char filename[], struct stat *buff)
             exit(0);
         }
         menuResult.count++;
-        if(strstr(filename,".c")!= NULL) // second child process
+        if (ends_with_c_extension(filename)) // second child process
         {
             menuResult.pids[1] = handleCfile(filename);
             menuResult.count++;
         }
-
     }
     else if (S_ISLNK(buff->st_mode))
     {
@@ -141,7 +140,6 @@ Result handleMenu(char filename[], struct stat *buff)
             exit(0);
         }
         menuResult.count++;
-
     }
     else if (S_ISDIR(buff->st_mode))
     {
@@ -157,7 +155,7 @@ Result handleMenu(char filename[], struct stat *buff)
         }
         menuResult.count++;
         menuResult.pids[1] = fork();
-        if(menuResult.pids[1] == 0) // second child process
+        if (menuResult.pids[1] == 0) // second child process
         {
             char *args[] = {"./directoryScript.sh", filename, NULL};
             execvp(args[0], args);
@@ -175,7 +173,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     struct stat buff;
-    pid_t pids[2*argc];
+    pid_t pids[2 * argc];
     int pidCounter = 0;
     for (int i = 1; i < argc; i++)
     {
@@ -185,7 +183,7 @@ int main(int argc, char *argv[])
             perror("lstat");
             exit(EXIT_FAILURE);
         }
-        
+
         Result menuResult = handleMenu(argv[i], &buff);
         for (int j = 0; j < menuResult.count; j++)
         {
