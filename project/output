@@ -1,0 +1,86 @@
+Regular file: file.txt
+Enter options:
+-n (file name)
+-d (dim/size)
+-h (number of hard links)
+-m (time of last modif)
+-a (access rights)
+-l [filename] (create a symbolic link)
+file.txt
+Regular file: file.txt
+Enter options:
+-n (file name)
+-d (dim/size)
+-h (number of hard links)
+-m (time of last modif)
+-a (access rights)
+-l [filename] (create a symbolic link)
+Directory: dirA
+Enter options:
+-n (name)
+-d(dim/size)
+-a (access rights)
+-c (total number of .c files)
+dirA
+Regular file: file.txt
+Enter options:
+-n (file name)
+-d (dim/size)
+-h (number of hard links)
+-m (time of last modif)
+-a (access rights)
+-l [filename] (create a symbolic link)
+Directory: dirA
+Enter options:
+-n (name)
+-d(dim/size)
+-a (access rights)
+-c (total number of .c files)
+Regular file: file.txt
+Enter options:
+-n (file name)
+-d (dim/size)
+-h (number of hard links)
+-m (time of last modif)
+-a (access rights)
+-l [filename] (create a symbolic link)
+Directory: dirA
+Enter options:
+-n (name)
+-d(dim/size)
+-a (access rights)
+-c (total number of .c files)
+Symbolic link: fileLink
+Enter options:
+-n (link name)
+-l (delete link)
+-d (size of link)
+-z (size of target)
+-a (access rights for symbolic link)
+fileLink
+fileLink
+Regular file: file.txt
+Enter options:
+-n (file name)
+-d (dim/size)
+-h (number of hard links)
+-m (time of last modif)
+-a (access rights)
+-l [filename] (create a symbolic link)
+Directory: dirA
+Enter options:
+-n (name)
+-d(dim/size)
+-a (access rights)
+-c (total number of .c files)
+Symbolic link: fileLink
+Enter options:
+-n (link name)
+-l (delete link)
+-d (size of link)
+-z (size of target)
+-a (access rights for symbolic link)
+Child exited with status 0
+Child exited with status 0
+Child exited with status 0
+Child exited with status 0

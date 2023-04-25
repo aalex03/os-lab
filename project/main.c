@@ -12,13 +12,7 @@
 #include <sys/wait.h>
 #include "helpers.h"
 
-typedef struct _result
-{
-    pid_t pids[5];
-    int count;
-} Result;
-
-Result handleMenu(char filename[], struct stat *buff);
+void handleMenu(char filename[], struct stat *buff);
 
 void handleRegularFile(char filename[], struct stat *buff, char options[])
 {
@@ -104,28 +98,28 @@ void handleDirectory(char filename[], struct stat *buff, char options[])
     }
 }
 
-Result handleMenu(char filename[], struct stat *buff)
+void handleMenu(char filename[], struct stat *buff)
 {
     char input[100];
-    Result menuResult;
-    menuResult.count = 0;
     if (S_ISREG(buff->st_mode))
     {
         printf("Regular file: %s\nEnter options:\n-n (file name)\n-d (dim/size)\n-h (number of hard links)\n-m (time of last modif)\n-a (access rights)\n-l [filename] (create a symbolic link)\n", filename);
         fgets(input, 100, stdin);
         char options[10];
         sscanf(input, "-%10s", options);
-        menuResult.pids[0] = fork();
-        if (menuResult.pids[0] == 0) // first child process
+        pid_t pid = fork();
+        if (pid == 0) // first child process
         {
             handleRegularFile(filename, buff, options);
             exit(0);
         }
-        menuResult.count++;
         if (ends_with_c_extension(filename)) // second child process
         {
-            menuResult.pids[1] = handleCfile(filename);
-            menuResult.count++;
+            pid_t pid2 = fork();
+            if (pid2 == 0)
+            {
+                handleCfile(filename);
+            }
         }
     }
     else if (S_ISLNK(buff->st_mode))
@@ -134,13 +128,12 @@ Result handleMenu(char filename[], struct stat *buff)
         fgets(input, 10, stdin);
         char options[10];
         sscanf(input, "-%10s", options);
-        menuResult.pids[0] = fork();
-        if (menuResult.pids[0] == 0)
+        pid_t pid = fork();
+        if (pid == 0)
         {
             handleSymbolicLink(filename, buff, options);
             exit(0);
         }
-        menuResult.count++;
     }
     else if (S_ISDIR(buff->st_mode))
     {
@@ -148,23 +141,21 @@ Result handleMenu(char filename[], struct stat *buff)
         fgets(input, 10, stdin);
         char options[10];
         sscanf(input, "-%10s", options);
-        menuResult.pids[0] = fork();
-        if (menuResult.pids[0] == 0) // first child process
+        pid_t pid = fork();
+        if (pid == 0) // first child process
         {
             handleDirectory(filename, buff, options);
             exit(0);
         }
-        menuResult.count++;
-        menuResult.pids[1] = fork();
-        if (menuResult.pids[1] == 0) // second child process
+
+        pid_t pid2 = fork();
+        if (pid2 == 0) // second child process
         {
             char *args[] = {"./directoryScript.sh", filename, NULL};
             execvp(args[0], args);
             exit(0);
         }
-        menuResult.count++;
     }
-    return menuResult;
 }
 int main(int argc, char *argv[])
 {
@@ -174,8 +165,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     struct stat buff;
-    pid_t pids[2 * argc];
-    int pidCounter = 0;
     for (int i = 1; i < argc; i++)
     {
         int result = lstat(argv[i], &buff);
@@ -184,16 +173,12 @@ int main(int argc, char *argv[])
             perror("lstat");
             exit(EXIT_FAILURE);
         }
-
-        Result menuResult = handleMenu(argv[i], &buff);
-        for (int j = 0; j < menuResult.count; j++)
-        {
-            pids[pidCounter] = menuResult.pids[j];
-            pidCounter++;
-        }
+        handleMenu(argv[i], &buff);
     }
-    for (int i = 0; i < pidCounter; i++)
+    int status = 0;
+    pid_t pid = 0;
+    while ((pid = wait(&status)) > 0)
     {
-        waitpid(pids[i], NULL, 0);
+        print_exit_status(status);   
     }
 }
