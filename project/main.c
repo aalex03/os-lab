@@ -179,6 +179,7 @@ int main(int argc, char *argv[])
     pid_t pid = 0;
     while ((pid = wait(&status)) > 0)
     {
+        printf("PID %d: ",pid);
         print_exit_status(status);   
     }
 }
