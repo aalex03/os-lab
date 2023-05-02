@@ -91,3 +91,23 @@ void print_exit_status(int status)
         printf("Unknown status\n");
     }
 }
+
+int computeScore(int errors, int warnings)
+{
+    if(errors == 0 && warnings == 0)
+    {
+        return 10;
+    }
+    else if(errors > 0)
+    {
+        return 1;
+    }
+    else if(warnings > 10)
+    {
+        return 2;
+    }
+    else
+    {
+        return 2 + 8*(10-warnings)/10;
+    }
+}
