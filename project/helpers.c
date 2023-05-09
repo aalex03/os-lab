@@ -52,7 +52,6 @@ void printAccessRights(struct stat *file)
 
 void handleCfile(char filename[])
 {
-    printf("C file: %s\n", filename);
     char *args[] = {"./compileScript.sh", filename, NULL};
     execvp(args[0], args);
 }
