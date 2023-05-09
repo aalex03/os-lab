@@ -14,9 +14,8 @@ warnings=$(grep -c "warning:" output.txt)
 errors=$(grep -c "error:" output.txt)
 
 # Display the results
-echo "Compilation results for $1:"
-echo "  Warnings: $warnings"
-echo "  Errors: $errors"
+echo "warnings: $warnings"
+echo "errors: $errors"
 
 # Clean up
 rm -f output.txt "${1%.c}"

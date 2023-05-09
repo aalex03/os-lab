@@ -113,13 +113,33 @@ void handleMenu(char filename[], struct stat *buff)
             handleRegularFile(filename, buff, options);
             exit(0);
         }
-        if (ends_with_c_extension(filename)) // second child process
+        if (ends_with_c_extension(filename))
         {
+            int pipe_fd[2];
+            pipe(pipe_fd);
             pid_t pid2 = fork();
-            if (pid2 == 0)
+            if (pid2 == 0)  // second child process
             {
+                // close read end
+                close(pipe_fd[0]);
+                // redirect stdout to pipe
+                dup2(pipe_fd[1], STDOUT_FILENO);
                 handleCfile(filename);
+                exit(0);
             }
+            // close write end
+            close(pipe_fd[1]);
+            // redirect stdin to pipe
+            dup2(pipe_fd[0], STDIN_FILENO);
+            char buffer[2048];
+            int r = read(pipe_fd[0], buffer, 2048);
+            buffer[r] = '\0';
+            int warnings,errors;
+            sscanf(buffer,"warnings: %d",&warnings);
+            sscanf(buffer,"errors: %d",&errors);
+
+            int score = computeScore(warnings,errors);
+            printf("Score: %d\n",score);
         }
     }
     else if (S_ISLNK(buff->st_mode))
