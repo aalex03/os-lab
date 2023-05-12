@@ -141,6 +141,16 @@ void handleMenu(char filename[], struct stat *buff)
             int score = computeScore(warnings,errors);
             printf("Score: %d\n",score);
         }
+        else
+        {
+            pid_t pid2 = fork();
+            if (pid2 == 0) // second child process
+            {
+                int lines = countLinesInFile(filename);
+                printf("Lines: %d\n", lines);
+                exit(0);
+            }
+        }
     }
     else if (S_ISLNK(buff->st_mode))
     {

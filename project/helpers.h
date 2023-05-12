@@ -19,3 +19,4 @@ void printAccessRights(struct stat *file);
 int ends_with_c_extension(char filename[]);
 void print_exit_status(int status);
 int computeScore(int errors,int warnings);
+int countLinesInFile(char filename[]);

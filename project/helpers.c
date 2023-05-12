@@ -110,3 +110,29 @@ int computeScore(int errors, int warnings)
         return 2 + 8*(10-warnings)/10;
     }
 }
+
+int countLinesInFile(char filename[])
+{
+    FILE *fp = fopen(filename, "r");
+    int lineCount = 0;
+    char ch,prevCh = '\0';
+    ch = getc(fp);
+    if(ch != EOF)
+    {
+        lineCount = 1; // we have at least one line
+    }
+    ungetc(ch, fp); // put the character back (we don't want to skip the first line)
+    while((ch = fgetc(fp)) != EOF)
+    {
+        if(ch == '\n')
+        {
+            if(prevCh != '\n')  // exclude consecutive newlines
+            {
+                lineCount++;
+            }
+        }
+        prevCh = ch;
+    }
+    fclose(fp);
+    return lineCount;
+}
