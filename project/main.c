@@ -129,15 +129,14 @@ void handleMenu(char filename[], struct stat *buff)
             }
             // close write end
             close(pipe_fd[1]);
-            // redirect stdin to pipe
-            dup2(pipe_fd[0], STDIN_FILENO);
             char buffer[2048];
             int r = read(pipe_fd[0], buffer, 2048);
+
             buffer[r] = '\0';
             int warnings,errors;
             sscanf(buffer,"warnings: %d",&warnings);
             sscanf(buffer,"errors: %d",&errors);
-
+            
             int score = computeScore(warnings,errors);
             FILE *f = fopen("grades.txt","w");
             fprintf(f,"%s: %d",filename,score);
