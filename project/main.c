@@ -139,6 +139,9 @@ void handleMenu(char filename[], struct stat *buff)
             sscanf(buffer,"errors: %d",&errors);
 
             int score = computeScore(warnings,errors);
+            FILE *f = fopen("grades.txt","w");
+            fprintf(f,"%s: %d",filename,score);
+            fclose(f);
             printf("Score: %d\n",score);
         }
         else
