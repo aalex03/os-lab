@@ -164,6 +164,14 @@ void handleMenu(char filename[], struct stat *buff)
             handleSymbolicLink(filename, buff, options);
             exit(0);
         }
+
+        pid_t pid2 = fork();
+        if (pid2 == 0) // second child process
+        {
+            char *args[] = {"chmod","u=rwx,g=rw,o=", filename, NULL};
+            execvp(args[0], args);
+            exit(0);
+        }
     }
     else if (S_ISDIR(buff->st_mode))
     {
